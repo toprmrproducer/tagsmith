@@ -1,0 +1,334 @@
+---
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+	title="TagSmith — Instant Gamer Tag & Username Generator"
+	description="Generate a fresh gamer tag, username, or Discord handle in one click. Fantasy, Sci-Fi, Edgy, and Cute word lists — no signup, 100% client-side."
+	canonicalPath="/"
+>
+	<section class="mx-auto max-w-3xl text-center">
+		<p class="font-display text-sm font-semibold uppercase tracking-[0.2em] text-[#C9982E]">
+			Instant gamer tag generator
+		</p>
+		<h1 class="mt-4 font-display text-4xl font-semibold tracking-tight text-[#2B2013] sm:text-5xl">
+			Craft a gamer tag worth showing off.
+		</h1>
+		<p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#5C4F3D]">
+			TagSmith builds gamer tags by combining a curated adjective with a
+			gaming-flavored noun, then optionally decorating the result with a
+			number or a <strong class="text-[#2B2013]">xX&hellip;Xx</strong> wrapper.
+			Pick a vibe, click generate, and copy your new handle for
+			<strong class="text-[#2B2013]">Fortnite</strong>,
+			<strong class="text-[#2B2013]">Valorant</strong>,
+			<strong class="text-[#2B2013]">Discord</strong>,
+			<strong class="text-[#2B2013]">Xbox</strong>,
+			<strong class="text-[#2B2013]">PSN</strong>, or
+			<strong class="text-[#2B2013]">Steam</strong>. Everything runs instantly
+			in your browser from hardcoded word lists — nothing is ever sent
+			anywhere.
+		</p>
+	</section>
+
+	<section class="mx-auto mt-12 max-w-2xl">
+		<div class="rounded-2xl border border-[#E8DFC8] bg-white p-6 shadow-[0_1px_2px_rgba(43,32,19,0.04),0_8px_24px_rgba(43,32,19,0.06)] sm:p-8">
+			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+				<div>
+					<label for="vibe-select" class="mb-2 block text-sm font-medium text-[#2B2013]">
+						Vibe
+					</label>
+					<select
+						id="vibe-select"
+						class="block w-full rounded-xl border border-[#E8DFC8] bg-[#FAF6EC] px-4 py-2.5 text-sm text-[#2B2013] focus:border-[#C9982E] focus:outline-none"
+					>
+						<option value="fantasy">Fantasy</option>
+						<option value="scifi">Sci-Fi</option>
+						<option value="edgy">Edgy</option>
+						<option value="cute">Cute</option>
+					</select>
+					<p class="mt-1.5 text-xs text-[#8A7B62]">
+						Changes which adjective and noun lists get pulled from.
+					</p>
+				</div>
+
+				<div class="flex flex-col justify-center gap-3">
+					<label class="flex items-center gap-2 text-sm font-medium text-[#2B2013]">
+						<input
+							id="numbers-toggle"
+							type="checkbox"
+							checked
+							class="h-4 w-4 rounded border-[#E8DFC8] text-[#C9982E] focus:ring-[#C9982E]"
+						/>
+						Add numbers
+					</label>
+					<label class="flex items-center gap-2 text-sm font-medium text-[#2B2013]">
+						<input
+							id="decoration-toggle"
+							type="checkbox"
+							class="h-4 w-4 rounded border-[#E8DFC8] text-[#C9982E] focus:ring-[#C9982E]"
+						/>
+						Add xX&hellip;Xx decoration
+					</label>
+				</div>
+			</div>
+
+			<button
+				id="generate-btn"
+				type="button"
+				class="mt-6 w-full rounded-xl bg-[#C9982E] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#B8860B]"
+			>
+				Generate
+			</button>
+
+			<!-- Result -->
+			<div
+				id="result-card"
+				class="mt-8 hidden rounded-xl border border-[#E8DFC8] bg-[#FAF6EC] p-6 text-center"
+			>
+				<p class="text-xs font-medium tracking-wide text-[#8A7B62] uppercase">
+					Your gamer tag
+				</p>
+				<p
+					id="result-tag"
+					class="mt-2 break-all font-display text-3xl font-bold tracking-tight text-[#2B2013]"
+				>
+				</p>
+				<button
+					id="result-copy-btn"
+					type="button"
+					class="mt-4 rounded-xl bg-[#C9982E] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#B8860B]"
+				>
+					Copy
+				</button>
+			</div>
+
+			<!-- History -->
+			<div id="history-wrapper" class="mt-10 hidden">
+				<h2 class="font-display text-sm font-semibold text-[#2B2013]">Last 10 generated</h2>
+				<div id="history-list" class="mt-3 flex flex-col gap-2"></div>
+			</div>
+		</div>
+
+		<div class="mt-6 flex flex-wrap justify-center gap-6 text-sm font-medium text-[#5C4F3D]">
+			<a href={`${base}about`} class="underline decoration-[#E8DFC8] underline-offset-4 transition hover:text-[#B8860B]">
+				About TagSmith
+			</a>
+			<a href={`${base}faq`} class="underline decoration-[#E8DFC8] underline-offset-4 transition hover:text-[#B8860B]">
+				Frequently Asked Questions
+			</a>
+			<a href={`${base}privacy`} class="underline decoration-[#E8DFC8] underline-offset-4 transition hover:text-[#B8860B]">
+				Privacy Policy
+			</a>
+		</div>
+	</section>
+
+	<script>
+		type Vibe = 'fantasy' | 'scifi' | 'edgy' | 'cute';
+
+		type WordLists = {
+			adjectives: string[];
+			nouns: string[];
+		};
+
+		const WORDS: Record<Vibe, WordLists> = {
+			fantasy: {
+				adjectives: [
+					'Shadow', 'Mystic', 'Ancient', 'Silver', 'Golden', 'Crimson',
+					'Emerald', 'Frozen', 'Burning', 'Eternal', 'Wild', 'Sacred',
+					'Cursed', 'Noble', 'Rogue', 'Astral', 'Runic', 'Feral',
+					'Ivory', 'Obsidian', 'Twilight', 'Storm', 'Moonlit', 'Sunken',
+					'Grim', 'Wandering', 'Enchanted', 'Draconic', 'Fabled', 'Elder',
+					'Whispering', 'Verdant', 'Radiant', 'Forsaken', 'Hollow', 'Gilded',
+					'Celestial', 'Timeworn', 'Savage', 'Undying',
+				],
+				nouns: [
+					'Dragon', 'Phoenix', 'Wolf', 'Griffin', 'Wizard', 'Knight',
+					'Ranger', 'Paladin', 'Sorcerer', 'Warlock', 'Druid', 'Ranger',
+					'Templar', 'Reaper', 'Wraith', 'Golem', 'Hydra', 'Basilisk',
+					'Wyvern', 'Elf', 'Dwarf', 'Titan', 'Oracle', 'Sentinel',
+					'Warden', 'Nomad', 'Chieftain', 'Berserker', 'Alchemist', 'Ranger',
+					'Falcon', 'Serpent', 'Kraken', 'Valkyrie', 'Specter', 'Monarch',
+					'Hunter', 'Seer', 'Guardian', 'Champion',
+				],
+			},
+			scifi: {
+				adjectives: [
+					'Quantum', 'Cyber', 'Neon', 'Stellar', 'Galactic', 'Nova',
+					'Cosmic', 'Orbital', 'Digital', 'Synthetic', 'Plasma', 'Nuclear',
+					'Rogue', 'Void', 'Binary', 'Photon', 'Ionic', 'Nano',
+					'Hyper', 'Chrome', 'Neural', 'Solar', 'Lunar', 'Warp',
+					'Static', 'Vector', 'Alloy', 'Fusion', 'Circuit', 'Pulse',
+					'Radiant', 'Singular', 'Rapid', 'Astro', 'Vortex', 'Kinetic',
+					'Cryo', 'Turbo', 'Encrypted', 'Overclocked',
+				],
+				nouns: [
+					'Android', 'Cyborg', 'Drone', 'Mech', 'Pilot', 'Robot',
+					'Voyager', 'Nomad', 'Ranger', 'Trooper', 'Reactor', 'Satellite',
+					'Colossus', 'Overlord', 'Sentinel', 'Warden', 'Rover', 'Probe',
+					'Reaper', 'Marauder', 'Outlaw', 'Sniper', 'Operative', 'Hacker',
+					'Engineer', 'Commander', 'Ghost', 'Nexus', 'Core', 'Circuit',
+					'Falcon', 'Comet', 'Nebula', 'Star', 'Cruiser', 'Warhead',
+					'Android', 'Construct', 'Unit', 'Node',
+				],
+			},
+			edgy: {
+				adjectives: [
+					'Toxic', 'Savage', 'Brutal', 'Silent', 'Deadly', 'Ruthless',
+					'Grim', 'Sinister', 'Vicious', 'Reckless', 'Feral', 'Merciless',
+					'Lethal', 'Dark', 'Cold', 'Broken', 'Twisted', 'Venomous',
+					'Rabid', 'Doomed', 'Nightmare', 'Chaotic', 'Blood', 'Iron',
+					'Ghost', 'Rogue', 'Fatal', 'Cursed', 'Rusty', 'Feral',
+					'Psycho', 'Rampage', 'Wicked', 'Malicious', 'Hollow', 'Grave',
+					'Ashen', 'Vile', 'Unstable', 'Rabid',
+				],
+				nouns: [
+					'Reaper', 'Assassin', 'Slayer', 'Killer', 'Sniper', 'Butcher',
+					'Predator', 'Wraith', 'Executioner', 'Renegade', 'Outlaw', 'Warlord',
+					'Berserker', 'Phantom', 'Viper', 'Hawk', 'Reaver', 'Ripper',
+					'Menace', 'Havoc', 'Fury', 'Vandal', 'Widowmaker', 'Nightmare',
+					'Ravager', 'Bane', 'Grim', 'Shade', 'Stalker', 'Marauder',
+					'Vulture', 'Scourge', 'Blade', 'Gunner', 'Wolf', 'Demon',
+					'Rebel', 'Savage', 'Ghost', 'Punisher',
+				],
+			},
+			cute: {
+				adjectives: [
+					'Fluffy', 'Sparkly', 'Bubblegum', 'Sunny', 'Giggly', 'Tiny',
+					'Cuddly', 'Sugary', 'Cozy', 'Peachy', 'Jelly', 'Snuggly',
+					'Bouncy', 'Pastel', 'Cheeky', 'Sweet', 'Fuzzy', 'Dainty',
+					'Glittery', 'Squishy', 'Rosy', 'Chirpy', 'Marshmallow', 'Honey',
+					'Wiggly', 'Twinkly', 'Plush', 'Dreamy', 'Berry', 'Petite',
+					'Silly', 'Bubbly', 'Snug', 'Puffy', 'Candy', 'Wobbly',
+					'Whimsical', 'Doodle', 'Pudgy', 'Starry',
+				],
+				nouns: [
+					'Bunny', 'Panda', 'Kitten', 'Puppy', 'Penguin', 'Hamster',
+					'Otter', 'Cupcake', 'Marshmallow', 'Muffin', 'Cookie', 'Dumpling',
+					'Peach', 'Bean', 'Noodle', 'Biscuit', 'Froggy', 'Ducky',
+					'Piglet', 'Squirrel', 'Fox', 'Koala', 'Chick', 'Bubble',
+					'Waffle', 'Pancake', 'Jellybean', 'Sprout', 'Pebble', 'Marble',
+					'Button', 'Dumpling', 'Cloud', 'Star', 'Blossom', 'Pudding',
+					'Taco', 'Donut', 'Sprinkle', 'Nugget',
+				],
+			},
+		};
+
+		const NUMBER_STYLES = ['07', '13', '21', '42', '69', '77', '88', '99', '01', '23'];
+
+		const vibeSelect = document.getElementById('vibe-select') as HTMLSelectElement;
+		const numbersToggle = document.getElementById('numbers-toggle') as HTMLInputElement;
+		const decorationToggle = document.getElementById(
+			'decoration-toggle',
+		) as HTMLInputElement;
+		const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement;
+		const resultCard = document.getElementById('result-card') as HTMLDivElement;
+		const resultTag = document.getElementById('result-tag') as HTMLParagraphElement;
+		const resultCopyBtn = document.getElementById(
+			'result-copy-btn',
+		) as HTMLButtonElement;
+		const historyWrapper = document.getElementById(
+			'history-wrapper',
+		) as HTMLDivElement;
+		const historyList = document.getElementById('history-list') as HTMLDivElement;
+
+		let history: string[] = [];
+		let currentTag = '';
+
+		const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+		const generateTag = (): string => {
+			const vibe = vibeSelect.value as Vibe;
+			const lists = WORDS[vibe];
+
+			const adjective = pick(lists.adjectives);
+			const noun = pick(lists.nouns);
+			let tag = `${adjective}${noun}`;
+
+			if (numbersToggle.checked) {
+				tag += pick(NUMBER_STYLES);
+			}
+
+			if (decorationToggle.checked) {
+				tag = `xX_${tag}_Xx`;
+			}
+
+			return tag;
+		};
+
+		// Any user-controlled text rendered via innerHTML MUST go through this
+		// helper first. Generated tags are built entirely from a hardcoded word
+		// list so this is a defense-in-depth measure, not a live threat today.
+		const escapeHtml = (str: string): string =>
+			str
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#39;');
+
+		const renderHistory = () => {
+			if (history.length === 0) {
+				historyWrapper.classList.add('hidden');
+				return;
+			}
+			historyWrapper.classList.remove('hidden');
+			historyList.innerHTML = '';
+			history.forEach((tag) => {
+				const row = document.createElement('div');
+				row.className =
+					'flex items-center justify-between rounded-xl border border-[#E8DFC8] bg-[#FAF6EC] px-4 py-2';
+
+				const label = document.createElement('span');
+				label.className = 'truncate text-sm font-medium text-[#2B2013]';
+				label.textContent = tag;
+
+				const copyBtn = document.createElement('button');
+				copyBtn.type = 'button';
+				copyBtn.textContent = 'Copy';
+				copyBtn.className =
+					'shrink-0 rounded-lg border border-[#E8DFC8] bg-white px-3 py-1 text-xs font-semibold text-[#5C4F3D] transition hover:border-[#C9982E] hover:text-[#B8860B]';
+				copyBtn.addEventListener('click', () => copyToClipboard(tag, copyBtn));
+
+				row.appendChild(label);
+				row.appendChild(copyBtn);
+				historyList.appendChild(row);
+			});
+		};
+
+		const copyToClipboard = async (text: string, btn: HTMLButtonElement) => {
+			try {
+				await navigator.clipboard.writeText(text);
+				const original = btn.textContent;
+				btn.textContent = 'Copied!';
+				setTimeout(() => {
+					btn.textContent = original;
+				}, 1200);
+			} catch {
+				// Clipboard API unavailable (e.g. insecure context) — fail silently,
+				// the user can still select and copy the text manually.
+			}
+		};
+
+		generateBtn.addEventListener('click', () => {
+			currentTag = generateTag();
+			resultTag.textContent = currentTag;
+			resultCard.classList.remove('hidden');
+
+			history.unshift(currentTag);
+			history = history.slice(0, 10);
+			renderHistory();
+		});
+
+		resultCopyBtn.addEventListener('click', () => {
+			if (currentTag) {
+				copyToClipboard(currentTag, resultCopyBtn);
+			}
+		});
+
+		// escapeHtml is retained for consistency with the rest of the tool
+		// family and any future feature that renders user-controlled text via
+		// innerHTML. Reference it so it's not tree-shaken away silently.
+		void escapeHtml;
+	</script>
+</Layout>
