@@ -39,42 +39,107 @@ const canonical = new URL(
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
 			rel="stylesheet"
 		/>
+
+		<style>
+			/*
+			 * Ad slots reserve layout space but must be invisible until a real
+			 * <ins class="adsbygoogle"> is dropped in. Empty placeholder ad boxes
+			 * (visible dashed "Advertisement" frames) can hurt AdSense approval,
+			 * so unfilled slots collapse to zero visible footprint.
+			 */
+			.ad-slot:empty {
+				min-height: 0;
+			}
+			.ad-slot {
+				line-height: 0;
+			}
+		</style>
 	</head>
-	<body class="min-h-screen bg-[#FAF6EC] font-sans text-[#5C4F3D] antialiased">
-		<header class="border-b border-[#E8DFC8]">
-			<nav class="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+	<body class="min-h-screen bg-[#ffffff] font-sans text-[#4a4234] antialiased">
+		<header class="border-b border-[#eae4d6]">
+			<nav class="mx-auto flex max-w-[820px] items-center justify-between px-6 py-5">
 				<a
 					href={base}
-					class="font-display text-xl font-semibold tracking-tight text-[#2B2013]"
+					class="font-display text-xl font-extrabold tracking-tight text-[#221b10]"
 				>
-					Tag<span class="text-[#C9982E]">Smith</span>
+					Tag<span class="text-[#c9982e]">Smith</span>
 				</a>
-				<div class="hidden items-center gap-6 text-sm font-medium text-[#5C4F3D] sm:flex">
-					<a href={`${base}faq`} class="transition hover:text-[#B8860B]">FAQ</a>
-					<a href={`${base}about`} class="transition hover:text-[#B8860B]">About</a>
+				<div class="hidden items-center gap-7 text-[15px] font-semibold text-[#4a4234] sm:flex">
+					<a href={base} class="transition hover:text-[#b8860b]">Generator</a>
+					<a href={`${base}faq`} class="transition hover:text-[#b8860b]">FAQ</a>
+					<a href={`${base}about`} class="transition hover:text-[#b8860b]">About</a>
 				</div>
 			</nav>
 		</header>
 
-		<main class="mx-auto max-w-5xl px-6 py-14">
-			<slot />
-		</main>
+		<!--
+			Top leaderboard ad slot. Centered directly below the header, above the
+			main content column. Reserved + invisible until a real ad unit is added.
+		-->
+		<div
+			class="ad-slot ad-leaderboard mx-auto mt-4 w-full px-6"
+			data-ad-slot="leaderboard"
+			style="max-width:970px;min-height:0"
+		>
+			<!-- AdSense: paste responsive <ins class="adsbygoogle"> here -->
+		</div>
 
-		<footer class="mt-24 border-t border-[#E8DFC8]">
-			<div class="mx-auto max-w-5xl px-6 py-10 text-sm text-[#5C4F3D]">
-				<p>
+		<!--
+			Three-column shell: [left skyscraper][820px content][right skyscraper].
+			The two <aside> rails only appear at >=1280px (xl) and live in the
+			genuinely empty gutters beside the capped content column, giving ~310px
+			of clear space on each side at 1440px for AdSense inventory.
+		-->
+		<div class="mx-auto flex w-full max-w-[1440px] justify-center gap-8 px-6">
+			<aside
+				class="ad-slot ad-skyscraper hidden shrink-0 xl:block"
+				data-ad-slot="skyscraper-left"
+				style="width:160px;position:sticky;top:120px;align-self:flex-start"
+			>
+				<!-- AdSense: paste responsive <ins class="adsbygoogle"> here -->
+			</aside>
+
+			<main class="mx-auto w-full max-w-[820px] px-0 pt-24 pb-28">
+				<slot />
+
+				<!--
+					Bottom in-article ad slot. Centered just above the footer.
+					Reserved + invisible until a real ad unit is added.
+				-->
+				<div
+					class="ad-slot ad-in-article mx-auto mt-20"
+					data-ad-slot="in-article"
+					style="max-width:728px;min-height:0"
+				>
+					<!-- AdSense: paste responsive <ins class="adsbygoogle"> here -->
+				</div>
+			</main>
+
+			<aside
+				class="ad-slot ad-skyscraper hidden shrink-0 xl:block"
+				data-ad-slot="skyscraper-right"
+				style="width:160px;position:sticky;top:120px;align-self:flex-start"
+			>
+				<!-- AdSense: paste responsive <ins class="adsbygoogle"> here -->
+			</aside>
+		</div>
+
+		<footer class="mt-24 border-t border-[#eae4d6]">
+			<div class="mx-auto max-w-[820px] px-6 py-12 text-[15px] text-[#4a4234]">
+				<p class="max-w-xl">
 					Every gamer tag is generated locally in your browser. Nothing you
 					type or generate is ever sent to a server.
 				</p>
-				<div class="mt-4 flex gap-6">
-					<a href={`${base}about`} class="hover:text-[#B8860B]">About</a>
-					<a href={`${base}privacy`} class="hover:text-[#B8860B]">Privacy Policy</a>
-					<a href={`${base}faq`} class="hover:text-[#B8860B]">FAQ</a>
+				<div class="mt-5 flex flex-wrap gap-6 font-semibold">
+					<a href={base} class="transition hover:text-[#b8860b]">Generator</a>
+					<a href={`${base}about`} class="transition hover:text-[#b8860b]">About</a>
+					<a href={`${base}privacy`} class="transition hover:text-[#b8860b]">Privacy Policy</a>
+					<a href={`${base}faq`} class="transition hover:text-[#b8860b]">FAQ</a>
 				</div>
-				<p class="mt-4 text-[#8A7B62]">&copy; {new Date().getFullYear()} TagSmith</p>
+				<p class="mt-6 text-[#8a7e68]">&copy; {new Date().getFullYear()} TagSmith</p>
 			</div>
 		</footer>
 	</body>
